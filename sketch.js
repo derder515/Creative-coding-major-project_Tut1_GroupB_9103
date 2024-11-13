@@ -1,4 +1,4 @@
-// Lteration 2
+// Final version
 // ChatGPT helps review and translate comments.
 
 let sky, sea, reflection, main;
@@ -10,21 +10,15 @@ let reflectionRects = []; // Store rectangles for the reflection part
 
 function preload() {
     // Preload images
-    sky = loadImage('assets/sky.jpg');
-    sea = loadImage('assets/sea.jpg');
-    reflection = loadImage('assets/reflection.jpg');
-    main = loadImage('assets/main.jpg');
-}
-
-function windowResized() {
-    // Resize the canvas and reinitialize rectangles when window size changes
-    resizeCanvas(windowWidth, windowHeight);
-    rectInit();
+    sky = loadImage('assets/sky.png');
+    sea = loadImage('assets/sea.png');
+    reflection = loadImage('assets/reflection.png');
+    main = loadImage('assets/main.png');
 }
 
 function setup() {
     // Set up canvas size and basic drawing parameters
-    createCanvas(windowWidth, windowHeight);
+    createCanvas(600, 500);
     noFill();
     textAlign(CENTER, CENTER);
     angleMode(DEGREES); // Set angle mode to degrees
@@ -39,21 +33,24 @@ function rectInit() {
     sea.resize(width, height);
     reflection.resize(width, height);
     main.resize(width, height);
-
+    
     // Load pixel data for each image
     sky.loadPixels();
     sea.loadPixels();
     reflection.loadPixels();
     main.loadPixels();
 
-    // Iterate over the entire canvas to create rectangles based on pixel data
-    for (let x = 0; x < width; x += size / 2) {
+    // Get the pixel indices of a specific RGB value of a image, and draw rectangles
+    // We got the code reference this website:
+    // https://editor.p5js.org/iscodd/sketches/7-_pQbU9G 
+    // https://stackoverflow.com/questions/24689403/index-a-pixel-using-one-loop-or-two-loops
+    for (let x = 0; x < width; x += size / 2 ) {
         for (let y = 0; y < height; y += size / 2) {
             let index = (x + y * width) * 4; // Calculate the index in the pixel array
 
             // Sky Rectangles
             if (sky.pixels[index + 3] > 0) { // Check if the alpha value is greater than 0
-                //（This is to speed up the operation so that the program does not have to calculate the blank part of the image）
+                // Speed up the operation so that the program does not have to calculate the blank part of the image
                 skyRects.push(new Rect(
                     x, y,
                     sky.pixels[index],
@@ -135,7 +132,11 @@ function draw() {
 }
 
 // Rectangle class, used to store data for each rectangle and implement drawing and movement logic
+// We got the code reference this website:
+// https://editor.p5js.org/Jaekook/sketches/SywJ5wg57
+// https://p5js.org/reference/p5/class/
 class Rect {
+    // Data for a class is a collection of variables
     constructor(x, y, r, g, b, a, part) {
         this.x = x; // x-coordinate of the rectangle
         this.y = y; // y-coordinate of the rectangle
@@ -147,22 +148,16 @@ class Rect {
     }
 
     move() {
-        // Implement movement logic for rectangles
+        // If we want to add movement to the rectangle, we can add it here
+        // For the Individual part later
     }
 
     drawRect() {
         push(); // Save the current drawing settings
         noStroke(); // No border for the rectangle
         translate(this.x, this.y); // Move to the position of the rectangle
-
-        // Adjust rotation based on which part of the image it belongs to
-        if (this.part == "sky" || this.part == "sea") {
-            rotate(45); // Rotate 45 degrees
-        } else {
-            rotate(0); // No rotation
-        }
-
-        fill(this.r, this.g, this.b, this.a / 2); // Set the fill color and transparency
+        rotate(45);// Rotate the degrees of the rectangle
+        fill(this.r, this.g, this.b, this.a / 1); // Set the fill color and transparency
         rect(0, 0, size, size); // Draw the rectangle
         pop(); // Restore the previous drawing settings
     }
