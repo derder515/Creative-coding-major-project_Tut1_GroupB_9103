@@ -1,15 +1,15 @@
-// Iteration 1
+// Lteration 2
 // ChatGPT helps review and translate comments.
 
-let sky, sea, reflection, main; // Image variables for different sections
-let size = 10; // Size of each rectangle
-let skyRects = []; // Array to store rectangles for the sky section
-let seaRects = []; // Array to store rectangles for the sea section
-let mainRects = []; // Array to store rectangles for the main section
-let reflectionRects = []; // Array to store rectangles for the reflection section
+let sky, sea, reflection, main;
+let size = 10; // Size of rectangle (You can change rectangle's size here)
+let skyRects = []; // Store rectangles for the sky part
+let seaRects = []; // Store rectangles for the sea part
+let mainRects = []; // Store rectangles for the main part
+let reflectionRects = []; // Store rectangles for the reflection part
 
 function preload() {
-    // Preload images for each section
+    // Preload images
     sky = loadImage('assets/sky.jpg');
     sea = loadImage('assets/sea.jpg');
     reflection = loadImage('assets/reflection.jpg');
@@ -17,58 +17,54 @@ function preload() {
 }
 
 function windowResized() {
-    // Adjust canvas size and reinitialize rectangles when the window is resized
+    // Resize the canvas and reinitialize rectangles when window size changes
     resizeCanvas(windowWidth, windowHeight);
     rectInit();
 }
 
 function setup() {
-    // Set up the canvas and drawing parameters
-    createCanvas(600, 500);
-    noFill(); // Disable default fill
-    textAlign(CENTER, CENTER); // Center align text
-    angleMode(DEGREES); // Use degrees for angle calculations
-    rectMode(CENTER); // Draw rectangles from their center
-    noStroke(); // Disable stroke (borders)
-    rectInit(); // Initialize rectangles based on the image data
+    // Set up canvas size and basic drawing parameters
+    createCanvas(windowWidth, windowHeight);
+    noFill();
+    textAlign(CENTER, CENTER);
+    angleMode(DEGREES); // Set angle mode to degrees
+    rectMode(CENTER); // Set rectangle drawing mode to be centered
+    noStroke(); // No border for rectangles
+    rectInit(); // Initialize rectangles
 }
 
 function rectInit() {
-    // Resize images to fit the canvas and load their pixel data
+    // Initialize rectangles and extract data from images
     sky.resize(width, height);
     sea.resize(width, height);
     reflection.resize(width, height);
     main.resize(width, height);
-    
+
+    // Load pixel data for each image
     sky.loadPixels();
     sea.loadPixels();
     reflection.loadPixels();
     main.loadPixels();
-    
-    // Clear previous rectangles
-    skyRects = [];
-    seaRects = [];
-    mainRects = [];
-    reflectionRects = [];
 
-    // Loop through the canvas with step size half the rectangle size
-    for (let x = 0; x < width; x += size / 2 ) {
+    // Iterate over the entire canvas to create rectangles based on pixel data
+    for (let x = 0; x < width; x += size / 2) {
         for (let y = 0; y < height; y += size / 2) {
-            let index = (x + y * width) * 4; // Calculate pixel array index
+            let index = (x + y * width) * 4; // Calculate the index in the pixel array
 
-            // Create rectangles for the sky section if the pixel is not transparent
-            if (sky.pixels[index + 3] > 0) {
+            // Sky Rectangles
+            if (sky.pixels[index + 3] > 0) { // Check if the alpha value is greater than 0
+                //（This is to speed up the operation so that the program does not have to calculate the blank part of the image）
                 skyRects.push(new Rect(
                     x, y,
-                    sky.pixels[index],        // Red channel
-                    sky.pixels[index + 1],    // Green channel
-                    sky.pixels[index + 2],    // Blue channel
-                    sky.pixels[index + 3],    // Alpha channel
-                    "sky"                     // Section name
+                    sky.pixels[index],
+                    sky.pixels[index + 1],
+                    sky.pixels[index + 2],
+                    sky.pixels[index + 3],
+                    "sky"
                 ));
             }
 
-            // Create rectangles for the sea section if the pixel is not transparent
+            // Sea Rectangles
             if (sea.pixels[index + 3] > 0) {
                 seaRects.push(new Rect(
                     x, y,
@@ -80,7 +76,7 @@ function rectInit() {
                 ));
             }
 
-            // Create rectangles for the reflection section if the pixel is not transparent
+            // Reflection Rectangles
             if (reflection.pixels[index + 3] > 0) {
                 reflectionRects.push(new Rect(
                     x, y,
@@ -92,7 +88,7 @@ function rectInit() {
                 ));
             }
 
-            // Create rectangles for the main section if the pixel is not transparent
+            // Main Rectangles
             if (main.pixels[index + 3] > 0) {
                 mainRects.push(new Rect(
                     x, y,
@@ -108,66 +104,66 @@ function rectInit() {
 }
 
 function draw() {
-    background(255); // Set background color to white
+    background(255); // Set the background to white to avoid overlap
 
-    // Draw all rectangles for the sky section
+    // Draw all rectangles representing the sky part
     for (let i = 0; i < skyRects.length; i++) {
-        skyRects[i].move(); // Optional movement logic
-        skyRects[i].drawRect(); // Draw rectangle
+        skyRects[i].move(); // Implement rectangle movement logic (if needed)
+        skyRects[i].drawRect(); // Draw the rectangle
     }
 
-    // Draw all rectangles for the sea section
+    // Draw all rectangles representing the sea part
     for (let i = 0; i < seaRects.length; i++) {
         seaRects[i].move();
         seaRects[i].drawRect();
     }
 
-    // Draw all rectangles for the reflection section
+    // Draw all rectangles representing the reflection part
     for (let i = 0; i < reflectionRects.length; i++) {
         reflectionRects[i].move();
         reflectionRects[i].drawRect();
     }
 
-    // Draw all rectangles for the main section
+    // Draw all rectangles representing the main part
     for (let i = 0; i < mainRects.length; i++) {
         mainRects[i].move();
         mainRects[i].drawRect();
     }
 
-    // Print the total number of rectangles in all sections
+    // Print the total count of all rectangles
     print(skyRects.length + seaRects.length + reflectionRects.length + mainRects.length);
 }
 
-// Class representing a rectangle
+// Rectangle class, used to store data for each rectangle and implement drawing and movement logic
 class Rect {
     constructor(x, y, r, g, b, a, part) {
-        this.x = x; // X-coordinate
-        this.y = y; // Y-coordinate
+        this.x = x; // x-coordinate of the rectangle
+        this.y = y; // y-coordinate of the rectangle
         this.r = r; // Red value
         this.g = g; // Green value
         this.b = b; // Blue value
         this.a = a; // Alpha (transparency) value
-        this.part = part; // Section the rectangle belongs to (sky, sea, etc.)
+        this.part = part; // Part of the image the rectangle belongs to
     }
 
     move() {
-        // Movement logic for the rectangle (can be customized)
+        // Implement movement logic for rectangles
     }
 
     drawRect() {
-        push(); // Save current drawing settings
-        noStroke(); // Disable stroke for this rectangle
-        translate(this.x, this.y); // Move to the rectangle's position
+        push(); // Save the current drawing settings
+        noStroke(); // No border for the rectangle
+        translate(this.x, this.y); // Move to the position of the rectangle
 
-        // Apply a rotation based on the section type
+        // Adjust rotation based on which part of the image it belongs to
         if (this.part == "sky" || this.part == "sea") {
-            rotate(45); // Rotate by 45 degrees for sky and sea
+            rotate(45); // Rotate 45 degrees
         } else {
-            rotate(0); // No rotation for other sections
+            rotate(0); // No rotation
         }
 
-        fill(this.r, this.g, this.b, this.a / 2); // Set fill color and transparency
+        fill(this.r, this.g, this.b, this.a / 2); // Set the fill color and transparency
         rect(0, 0, size, size); // Draw the rectangle
-        pop(); // Restore previous drawing settings
+        pop(); // Restore the previous drawing settings
     }
 }
