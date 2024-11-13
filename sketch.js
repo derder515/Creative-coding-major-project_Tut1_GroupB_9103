@@ -1,58 +1,117 @@
-// Initial Concept
+// Initial Concept2
 // ChatGPT helps review and translate comments.
 
 let bg;
-let size = 20; // Size of each rectangle block
+let main;
+let size = 20;
+let rects = [];
+let mainRects = [];
 
 function preload() {
-    // Preload the background image
-    bg = loadImage('assets/bg.jpg');
+    // Preload images for background and main content
+    bg = loadImage('bg.jpg');
+    main = loadImage('main.png');
+}
+
+function windowResized() {
+    // Resize the canvas when the window size changes and reinitialize rectangles
+    resizeCanvas(windowWidth, windowHeight);
+    initializeRects();
 }
 
 function setup() {
-    // Set up canvas size and basic drawing parameters
-    createCanvas(640, 454);
-    noFill(); // Disable shape fill by default
-    textAlign(CENTER, CENTER); // Center text alignment
-    angleMode(DEGREES); // Use degrees for angle calculations
-    rectMode(CENTER); // Draw rectangles from their center
+    // Set up the canvas and drawing parameters
+    createCanvas(600, 500);
+    angleMode(DEGREES); // Use degrees for rotations
+    rectMode(CENTER); // Set rectangle mode to center
+    noStroke(); // Disable stroke for shapes
+    initializeRects();
+}
 
-    // Resize the background image to fit the canvas
+function initializeRects() {
+    // Resize images to fit canvas dimensions and load pixel data
     bg.resize(width, height);
-    noStroke(); // Disable borders for shapes
-    blendMode(DARKEST); // Apply a dark blend mode to enhance visual effects
+    main.resize(width, height);
+    bg.loadPixels();
+    main.loadPixels();
+
+    // Get the pixel indices of a specific RGB value of a image, and draw rectangles
+    // We got the code reference this website:
+    // https://editor.p5js.org/iscodd/sketches/7-_pQbU9G 
+    for (let x = 0; x < width; x += 4) {
+        for (let y = 0; y < height; y += 4) {
+            let index = (y * width + x) * 4
+            let part
+            // Divided
+            if (y < height * 0.574) {
+                part = "sky"
+            } else {
+                part = "sea"
+
+            }
+            rects.push(new Rect(x,
+                y,
+                bg.pixels[index],
+                bg.pixels[index + 1],
+                bg.pixels[index + 2],
+                bg.pixels[index + 3],
+                part
+            ))
+
+            if (main.pixels[index + 3] > 0) {
+                mainRects.push(new Rect(x,
+                    y,
+                    main.pixels[index],
+                    main.pixels[index + 1],
+                    main.pixels[index + 2],
+                    main.pixels[index + 3],
+                    "main"
+                ))
+            }
+
+        }
+    }
 }
 
 function draw() {
-    // Set the background color to white
+    // Set the background to white for each frame
     background(255);
 
-    // Load pixel data from the background image
-    bg.loadPixels();
-
-    // Loop through the canvas with a step size of 4 pixels
-    for (let x = 0; x < width; x += 4) {
-        for (let y = 0; y < height; y += 4) {
-            let index = (y * width + x) * 4; // Calculate the index in the pixel array
-            drawRect(
-                x,
-                y,
-                bg.pixels[index],      // Red channel
-                bg.pixels[index + 1],  // Green channel
-                bg.pixels[index + 2],  // Blue channel
-                bg.pixels[index + 3]   // Alpha (transparency) channel
-            );
-        }
+    // Draw all background rectangles
+    for (let rect of rects) {
+        rect.move(); // Update the position if applicable
+        rect.draw(); // Draw the rectangle
     }
-    noLoop(); // Stop the draw loop to render only once
+
+    // Draw all main image rectangles
+    for (let rect of mainRects) {
+        rect.move(); // Update the position if applicable
+        rect.draw(); // Draw the rectangle
+    }
 }
 
-// Function to draw a single rectangle
-function drawRect(x, y, r, g, b, a) {
-    push(); // Save current drawing settings
-    fill(r, g, b, a / 5); // Set fill color with reduced transparency for a softer effect
-    translate(x, y); // Move to the specified position
-    rotate(45); // Rotate rectangle by 45 degrees
-    rect(0, 0, size, size); // Draw the rectangle
-    pop(); // Restore previous drawing settings
+class Rect {
+
+    constructor(x, y, r, g, b, a, part) {
+        this.x = x; // X-coordinate of the rectangle
+        this.y = y; // Y-coordinate of the rectangle
+        this.r = r; // Red color value
+        this.g = g; // Green color value
+        this.b = b; // Blue color value
+        this.a = a; // Alpha (transparency) value
+        this.part = part; // Part of the image ('sky', 'sea', or 'main'）
+    }
+
+    draw() {
+        push();
+        noStroke();
+        translate(this.x, this.y); // Move to the rectangle's position
+        rotate(45);
+        fill(this.r, this.g, this.b, this.a / 5); // Set fill color with reduced alpha for transparency
+        rect(0, 0, size, size); // Draw the rectangle
+        pop();
+    }
+
+    move() {
+    }
 }
